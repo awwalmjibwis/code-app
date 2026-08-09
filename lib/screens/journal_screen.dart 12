@@ -1,7 +1,186 @@
 import 'package:flutter/material.dart';
 
-class JournalScreen extends StatelessWidget {
+class JournalScreen extends StatefulWidget {
   const JournalScreen({super.key});
+
+  @override
+  State<JournalScreen> createState() => _JournalScreenState();
+}
+
+class _JournalScreenState extends State<JournalScreen> {
+  final List<TradeEntry> _trades = [];
+
+  void _showAddTradeDialog() {
+    final symbolController = TextEditingController();
+    final entryController = TextEditingController();
+    final exitController = TextEditingController();
+    final profitLossController = TextEditingController();
+
+    String tradeType = "BUY";
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Add Trade"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: symbolController,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(
+                        labelText: "Symbol",
+                        hintText: "Example: EUR/USD",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    DropdownButtonFormField<String>(
+                      value: tradeType,
+                      decoration: const InputDecoration(
+                        labelText: "Trade Type",
+                        border: OutlineInputBorder(),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: "BUY",
+                          child: Text("BUY"),
+                        ),
+                        DropdownMenuItem(
+                          value: "SELL",
+                          child: Text("SELL"),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setDialogState(() {
+                            tradeType = value;
+                          });
+                        }
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: entryController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: const InputDecoration(
+                        labelText: "Entry Price",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: exitController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: const InputDecoration(
+                        labelText: "Exit Price",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: profitLossController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(
+                        decimal: true,
+                        signed: true,
+                      ),
+                      decoration: const InputDecoration(
+                        labelText: "Profit / Loss",
+                        hintText: "Example: 120 or -45",
+                        prefixText: "\$ ",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final symbol =
+                        symbolController.text.trim().toUpperCase();
+
+                    final entry =
+                        double.tryParse(entryController.text);
+
+                    final exit =
+                        double.tryParse(exitController.text);
+
+                    final profitLoss =
+                        double.tryParse(
+                      profitLossController.text,
+                    );
+
+                    if (symbol.isEmpty ||
+                        entry == null ||
+                        exit == null ||
+                        profitLoss == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Please enter valid trade details.",
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    setState(() {
+                      _trades.insert(
+                        0,
+                        TradeEntry(
+                          symbol: symbol,
+                          type: tradeType,
+                          entry: entry,
+                          exit: exit,
+                          profitLoss: profitLoss,
+                          date: DateTime.now(),
+                        ),
+                      );
+                    });
+
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text("Save Trade"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _deleteTrade(int index) {
+    setState(() {
+      _trades.removeAt(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,42 +189,123 @@ class JournalScreen extends StatelessWidget {
         title: const Text("Trading Journal"),
         centerTitle: true,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.book,
-                color: Colors.blue,
+      body: _trades.isEmpty
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.book_outlined,
+                      size: 70,
+                      color: Colors.amber,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      "No trades yet",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "Tap the + button to add your first trade.",
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-              title: Text("XAU/USD"),
-              subtitle: Text(
-                "BUY | Profit: +\$120\nDate: 07 Aug 2026",
-              ),
-            ),
-          ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _trades.length,
+              itemBuilder: (context, index) {
+                final trade = _trades[index];
 
-          SizedBox(height: 12),
+                final isProfit = trade.profitLoss >= 0;
 
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.book,
-                color: Colors.red,
-              ),
-              title: Text("EUR/USD"),
-              subtitle: Text(
-                "SELL | Loss: -\$45\nDate: 06 Aug 2026",
-              ),
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor:
+                          trade.type == "BUY"
+                              ? Colors.green
+                              : Colors.red,
+                      child: Icon(
+                        trade.type == "BUY"
+                            ? Icons.trending_up
+                            : Icons.trending_down,
+                        color: Colors.white,
+                      ),
+                    ),
+                    title: Text(
+                      "${trade.symbol} - ${trade.type}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "Entry: ${trade.entry}\n"
+                      "Exit: ${trade.exit}\n"
+                      "Date: ${_formatDate(trade.date)}",
+                    ),
+                    isThreeLine: true,
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${isProfit ? '+' : ''}\$${trade.profitLoss.toStringAsFixed(2)}",
+                          style: TextStyle(
+                            color: isProfit
+                                ? Colors.green
+                                : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            size: 20,
+                          ),
+                          onPressed: () => _deleteTrade(index),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: _showAddTradeDialog,
         child: const Icon(Icons.add),
       ),
     );
   }
+
+  String _formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}/"
+        "${date.month.toString().padLeft(2, '0')}/"
+        "${date.year}";
+  }
+}
+
+class TradeEntry {
+  final String symbol;
+  final String type;
+  final double entry;
+  final double exit;
+  final double profitLoss;
+  final DateTime date;
+
+  TradeEntry({
+    required this.symbol,
+    required this.type,
+    required this.entry,
+    required this.exit,
+    required this.profitLoss,
+    required this.date,
+  });
 }
