@@ -1,7 +1,51 @@
 import 'package:flutter/material.dart';
 
-class RiskCalculatorScreen extends StatelessWidget {
+class RiskCalculatorScreen extends StatefulWidget {
   const RiskCalculatorScreen({super.key});
+
+  @override
+  State<RiskCalculatorScreen> createState() =>
+      _RiskCalculatorScreenState();
+}
+
+class _RiskCalculatorScreenState extends State<RiskCalculatorScreen> {
+  final TextEditingController _balanceController =
+      TextEditingController();
+
+  final TextEditingController _riskController =
+      TextEditingController();
+
+  double _riskAmount = 0.0;
+
+  void _calculateRisk() {
+    final double? balance =
+        double.tryParse(_balanceController.text);
+
+    final double? risk =
+        double.tryParse(_riskController.text);
+
+    if (balance == null || risk == null || balance <= 0 || risk < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please enter valid balance and risk percentage.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _riskAmount = balance * (risk / 100);
+    });
+  }
+
+  @override
+  void dispose() {
+    _balanceController.dispose();
+    _riskController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,48 +54,100 @@ class RiskCalculatorScreen extends StatelessWidget {
         title: const Text("Risk Calculator"),
         centerTitle: true,
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const TextField(
-              decoration: InputDecoration(
-                labelText: "Account Balance",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+        children: [
+          const Text(
+            "Calculate your maximum risk per trade.",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: "Risk Percentage (%)",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+          ),
+
+          const SizedBox(height: 20),
+
+          TextField(
+            controller: _balanceController,
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Calculate"),
-              ),
+            decoration: const InputDecoration(
+              labelText: "Account Balance",
+              hintText: "Example: 1000",
+              prefixText: "\$ ",
+              border: OutlineInputBorder(),
             ),
-            const SizedBox(height: 24),
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  "Risk Amount: \$0.00",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+          ),
+
+          const SizedBox(height: 16),
+
+          TextField(
+            controller: _riskController,
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            decoration: const InputDecoration(
+              labelText: "Risk Percentage",
+              hintText: "Example: 2",
+              suffixText: "%",
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _calculateRisk,
+              icon: const Icon(Icons.calculate),
+              label: const Text("Calculate Risk"),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const Text(
+                    "Maximum Risk Amount",
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "\$${_riskAmount.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                "Example: If your account balance is \$1,000 "
+                "and you risk 2%, your maximum risk is \$20.",
+                style: TextStyle(
+                  height: 1.5,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
