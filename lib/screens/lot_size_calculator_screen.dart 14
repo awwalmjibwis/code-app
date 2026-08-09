@@ -1,7 +1,78 @@
 import 'package:flutter/material.dart';
 
-class LotSizeCalculatorScreen extends StatelessWidget {
+class LotSizeCalculatorScreen extends StatefulWidget {
   const LotSizeCalculatorScreen({super.key});
+
+  @override
+  State<LotSizeCalculatorScreen> createState() =>
+      _LotSizeCalculatorScreenState();
+}
+
+class _LotSizeCalculatorScreenState
+    extends State<LotSizeCalculatorScreen> {
+  final TextEditingController _balanceController =
+      TextEditingController();
+
+  final TextEditingController _riskController =
+      TextEditingController();
+
+  final TextEditingController _stopLossController =
+      TextEditingController();
+
+  double _lotSize = 0.0;
+  double _riskAmount = 0.0;
+
+  void _calculateLotSize() {
+    final double? balance =
+        double.tryParse(_balanceController.text);
+
+    final double? riskPercent =
+        double.tryParse(_riskController.text);
+
+    final double? stopLossPips =
+        double.tryParse(_stopLossController.text);
+
+    if (balance == null ||
+        riskPercent == null ||
+        stopLossPips == null ||
+        balance <= 0 ||
+        riskPercent <= 0 ||
+        stopLossPips <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please enter valid values in all fields.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    final double riskAmount =
+        balance * (riskPercent / 100);
+
+    // Standard Forex assumption:
+    // 1 standard lot = approximately $10 per pip
+    // for common USD-quoted pairs such as EUR/USD.
+    const double pipValuePerStandardLot = 10.0;
+
+    final double lotSize =
+        riskAmount /
+        (stopLossPips * pipValuePerStandardLot);
+
+    setState(() {
+      _riskAmount = riskAmount;
+      _lotSize = lotSize;
+    });
+  }
+
+  @override
+  void dispose() {
+    _balanceController.dispose();
+    _riskController.dispose();
+    _stopLossController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,65 +81,122 @@ class LotSizeCalculatorScreen extends StatelessWidget {
         title: const Text("Lot Size Calculator"),
         centerTitle: true,
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            const TextField(
-              decoration: InputDecoration(
-                labelText: "Account Balance",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+        children: [
+          const Text(
+            "Calculate an estimated Forex lot size based on your risk.",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
+          ),
 
-            const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-            const TextField(
-              decoration: InputDecoration(
-                labelText: "Risk Percentage (%)",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+          TextField(
+            controller: _balanceController,
+            keyboardType:
+                const TextInputType.numberWithOptions(
+              decimal: true,
             ),
-
-            const SizedBox(height: 16),
-
-            const TextField(
-              decoration: InputDecoration(
-                labelText: "Stop Loss (Pips)",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: "Account Balance",
+              hintText: "Example: 1000",
+              prefixText: "\$ ",
+              border: OutlineInputBorder(),
             ),
+          ),
 
-            const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Calculate Lot Size"),
-              ),
+          TextField(
+            controller: _riskController,
+            keyboardType:
+                const TextInputType.numberWithOptions(
+              decimal: true,
             ),
+            decoration: const InputDecoration(
+              labelText: "Risk Percentage",
+              hintText: "Example: 2",
+              suffixText: "%",
+              border: OutlineInputBorder(),
+            ),
+          ),
 
-            const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  "Recommended Lot Size: 0.00",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+          TextField(
+            controller: _stopLossController,
+            keyboardType:
+                const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            decoration: const InputDecoration(
+              labelText: "Stop Loss",
+              hintText: "Example: 50",
+              suffixText: "pips",
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _calculateLotSize,
+              icon: const Icon(Icons.calculate),
+              label: const Text("Calculate Lot Size"),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const Text(
+                    "Recommended Lot Size",
+                    style: TextStyle(fontSize: 16),
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  Text(
+                    _lotSize.toStringAsFixed(2),
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Risk Amount: \$${_riskAmount.toStringAsFixed(2)}",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: 20),
+
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                "This calculator uses an estimated $10 pip "
+                "value per standard lot for common USD-quoted "
+                "Forex pairs such as EUR/USD. Actual pip value "
+                "can differ depending on the pair, account "
+                "currency, and broker.",
+                style: TextStyle(height: 1.5),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
