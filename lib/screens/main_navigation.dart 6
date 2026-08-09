@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'home_screen.dart';
 import 'market_screen.dart';
 import 'signals_screen.dart';
@@ -16,13 +17,12 @@ class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
-  HomeScreen(),
-  MarketScreen(),
-  SignalsScreen(),
-  AIScreen(),
-  ProfileScreen(),
-];
-
+    HomeScreen(),
+    MarketScreen(),
+    SignalsScreen(),
+    AIScreen(),
+    ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -39,23 +39,23 @@ class _MainNavigationState extends State<MainNavigation> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: "Home",
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),
-            label: "Market",
+            label: 'Market',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.campaign),
-            label: "Signals",
+            label: 'Signals',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.smart_toy),
-            label: "AI",
+            label: 'AI',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: "Profile",
+            label: 'Profile',
           ),
         ],
       ),
