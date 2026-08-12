@@ -16,28 +16,55 @@ class _LotSizeCalculatorScreenState
   final TextEditingController _riskController =
       TextEditingController();
 
+  final TextEditingController _entryController =
+      TextEditingController();
+
   final TextEditingController _stopLossController =
       TextEditingController();
 
-  double _lotSize = 0.0;
-  double _riskAmount = 0.0;
+  final TextEditingController _pipValueController =
+      TextEditingController();
+
+  double? _lotSize;
+  double? _riskAmount;
+  double? _stopDistance;
+
+  @override
+  void dispose() {
+    _balanceController.dispose();
+    _riskController.dispose();
+    _entryController.dispose();
+    _stopLossController.dispose();
+    _pipValueController.dispose();
+    super.dispose();
+  }
 
   void _calculateLotSize() {
-    final double? balance =
-        double.tryParse(_balanceController.text);
+    final balance =
+        double.tryParse(_balanceController.text.trim());
 
-    final double? riskPercent =
-        double.tryParse(_riskController.text);
+    final riskPercent =
+        double.tryParse(_riskController.text.trim());
 
-    final double? stopLossPips =
-        double.tryParse(_stopLossController.text);
+    final entry =
+        double.tryParse(_entryController.text.trim());
+
+    final stopLoss =
+        double.tryParse(_stopLossController.text.trim());
+
+    final pipValue =
+        double.tryParse(_pipValueController.text.trim());
 
     if (balance == null ||
         riskPercent == null ||
-        stopLossPips == null ||
+        entry == null ||
+        stopLoss == null ||
+        pipValue == null ||
         balance <= 0 ||
         riskPercent <= 0 ||
-        stopLossPips <= 0) {
+        entry <= 0 ||
+        stopLoss <= 0 ||
+        pipValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -48,51 +75,118 @@ class _LotSizeCalculatorScreenState
       return;
     }
 
-    final double riskAmount =
-        balance * (riskPercent / 100);
+    if (riskPercent > 100) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Risk percentage cannot be greater than 100%.",
+          ),
+        ),
+      );
+      return;
+    }
 
-    // Standard Forex assumption:
-    // 1 standard lot = approximately $10 per pip
-    // for common USD-quoted pairs such as EUR/USD.
-    const double pipValuePerStandardLot = 10.0;
+    final stopDistance = (entry - stopLoss).abs();
 
-    final double lotSize =
-        riskAmount /
-        (stopLossPips * pipValuePerStandardLot);
+    if (stopDistance == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Entry Price and Stop Loss cannot be the same.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    final riskAmount =
+        balance * riskPercent / 100;
+
+    final lotSize =
+        riskAmount / (stopDistance * pipValue);
 
     setState(() {
       _riskAmount = riskAmount;
+      _stopDistance = stopDistance;
       _lotSize = lotSize;
     });
   }
 
-  @override
-  void dispose() {
-    _balanceController.dispose();
-    _riskController.dispose();
-    _stopLossController.dispose();
-    super.dispose();
+  void _clear() {
+    _balanceController.clear();
+    _riskController.clear();
+    _entryController.clear();
+    _stopLossController.clear();
+    _pipValueController.clear();
+
+    setState(() {
+      _lotSize = null;
+      _riskAmount = null;
+      _stopDistance = null;
+    });
+  }
+
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+    String? hint,
+    String? suffix,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      suffixText: suffix,
+      prefixIcon: Icon(icon),
+      border: const OutlineInputBorder(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Lot Size Calculator"),
+        title: const Text(
+          "Lot Size Calculator",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
+
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const Icon(
+            Icons.straighten,
+            size: 80,
+            color: Colors.amber,
+          ),
+
+          const SizedBox(height: 15),
+
           const Text(
-            "Calculate an estimated Forex lot size based on your risk.",
+            "Calculate Your Lot Size",
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
+
+          const Text(
+            "Enter your trade details to estimate "
+            "the position size based on your risk.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white70,
+              height: 1.4,
+            ),
+          ),
+
+          const SizedBox(height: 30),
 
           TextField(
             controller: _balanceController,
@@ -100,15 +194,15 @@ class _LotSizeCalculatorScreenState
                 const TextInputType.numberWithOptions(
               decimal: true,
             ),
-            decoration: const InputDecoration(
-              labelText: "Account Balance",
-              hintText: "Example: 1000",
-              prefixText: "\$ ",
-              border: OutlineInputBorder(),
+            decoration: _inputDecoration(
+              label: "Account Balance",
+              hint: "Example: 1000",
+              icon: Icons.account_balance_wallet,
+              suffix: "\$",
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
 
           TextField(
             controller: _riskController,
@@ -116,15 +210,30 @@ class _LotSizeCalculatorScreenState
                 const TextInputType.numberWithOptions(
               decimal: true,
             ),
-            decoration: const InputDecoration(
-              labelText: "Risk Percentage",
-              hintText: "Example: 2",
-              suffixText: "%",
-              border: OutlineInputBorder(),
+            decoration: _inputDecoration(
+              label: "Risk Percentage",
+              hint: "Example: 2",
+              icon: Icons.percent,
+              suffix: "%",
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
+
+          TextField(
+            controller: _entryController,
+            keyboardType:
+                const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            decoration: _inputDecoration(
+              label: "Entry Price",
+              hint: "Example: 2350.50",
+              icon: Icons.login,
+            ),
+          ),
+
+          const SizedBox(height: 18),
 
           TextField(
             controller: _stopLossController,
@@ -132,72 +241,181 @@ class _LotSizeCalculatorScreenState
                 const TextInputType.numberWithOptions(
               decimal: true,
             ),
-            decoration: const InputDecoration(
-              labelText: "Stop Loss",
-              hintText: "Example: 50",
-              suffixText: "pips",
-              border: OutlineInputBorder(),
+            decoration: _inputDecoration(
+              label: "Stop Loss Price",
+              hint: "Example: 2340.50",
+              icon: Icons.stop_circle,
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
+
+          TextField(
+            controller: _pipValueController,
+            keyboardType:
+                const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            decoration: _inputDecoration(
+              label: "Pip Value per Lot",
+              hint: "Example: 10",
+              icon: Icons.attach_money,
+              suffix: "\$/unit",
+            ),
+          ),
+
+          const SizedBox(height: 25),
 
           SizedBox(
-            width: double.infinity,
+            height: 52,
             child: ElevatedButton.icon(
               onPressed: _calculateLotSize,
               icon: const Icon(Icons.calculate),
-              label: const Text("Calculate Lot Size"),
+              label: const Text(
+                "Calculate Lot Size",
+                style: TextStyle(fontSize: 16),
+              ),
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
 
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Text(
-                    "Recommended Lot Size",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _lotSize.toStringAsFixed(2),
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber,
+          SizedBox(
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: _clear,
+              icon: const Icon(Icons.clear),
+              label: const Text("Clear"),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          if (_lotSize != null)
+            Card(
+              color: Colors.blue.withValues(alpha: 0.15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.analytics,
+                      size: 50,
+                      color: Colors.green,
                     ),
+
+                    const SizedBox(height: 12),
+
+                    const Text(
+                      "Recommended Lot Size",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      _lotSize!.toStringAsFixed(2),
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    _resultRow(
+                      "Risk Amount",
+                      "\$${_riskAmount!.toStringAsFixed(2)}",
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    _resultRow(
+                      "Stop Distance",
+                      _stopDistance!.toStringAsFixed(2),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    const Text(
+                      "This is an estimate. Always verify "
+                      "the pip value and contract specifications "
+                      "for your broker and trading instrument.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white60,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 25),
+
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.amber,
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Risk Amount: \$${_riskAmount.toStringAsFixed(2)}",
-                    style: const TextStyle(fontSize: 16),
+
+                  SizedBox(width: 12),
+
+                  Expanded(
+                    child: Text(
+                      "Lot size depends on your account size, "
+                      "risk percentage, stop-loss distance, "
+                      "and the value of the instrument.",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        height: 1.4,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          const Card(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                "This calculator uses an estimated $10 pip "
-                "value per standard lot for common USD-quoted "
-                "Forex pairs such as EUR/USD. Actual pip value "
-                "can differ depending on the pair, account "
-                "currency, and broker.",
-                style: TextStyle(height: 1.5),
-              ),
-            ),
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _resultRow(
+    String title,
+    String value,
+  ) {
+    return Row(
+      mainAxisAlignment:
+          MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white70,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 }
