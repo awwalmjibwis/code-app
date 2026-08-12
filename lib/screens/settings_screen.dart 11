@@ -1,40 +1,303 @@
 import 'package:flutter/material.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _darkMode = true;
+  bool _notifications = true;
+
+  String _language = "English";
+
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Choose Language"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text("English"),
+                value: "English",
+                groupValue: _language,
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  setState(() {
+                    _language = value;
+                  });
+
+                  Navigator.pop(context);
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text("Hausa"),
+                value: "Hausa",
+                groupValue: _language,
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  setState(() {
+                    _language = value;
+                  });
+
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAboutDialog() {
+    showAboutDialog(
+      context: context,
+      applicationName: "Jibwis AI",
+      applicationVersion: "1.0.0",
+      applicationIcon: const Icon(
+        Icons.smart_toy,
+        color: Colors.amber,
+        size: 45,
+      ),
+      children: const [
+        Text(
+          "Jibwis AI is a smart trading assistant "
+          "for Forex and Crypto traders.",
+        ),
+      ],
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Logout"),
+          content: const Text(
+            "Are you sure you want to logout?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      "Logout will be connected to Firebase later.",
+                    ),
+                  ),
+                );
+              },
+              child: const Text("Logout"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: const Text(
+          "Settings",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
       body: ListView(
-        children: const [
-          ListTile(
-            leading: Icon(Icons.dark_mode),
-            title: Text("Dark Mode"),
-            subtitle: Text("Enabled"),
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text(
+            "Preferences",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.language),
-            title: Text("Language"),
-            subtitle: Text("English / Hausa"),
+
+          const SizedBox(height: 12),
+
+          Card(
+            child: SwitchListTile(
+              secondary: const Icon(
+                Icons.dark_mode,
+                color: Colors.blue,
+              ),
+              title: const Text("Dark Mode"),
+              subtitle: const Text(
+                "Use dark theme throughout the app",
+              ),
+              value: _darkMode,
+              onChanged: (value) {
+                setState(() {
+                  _darkMode = value;
+                });
+              },
+            ),
           ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.notifications),
-            title: Text("Notifications"),
-            subtitle: Text("Enabled"),
+
+          const SizedBox(height: 10),
+
+          Card(
+            child: ListTile(
+              leading: const Icon(
+                Icons.language,
+                color: Colors.green,
+              ),
+              title: const Text("Language"),
+              subtitle: Text(_language),
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+              ),
+              onTap: _showLanguageDialog,
+            ),
           ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.info),
-            title: Text("About Jibwis AI"),
-            subtitle: Text("Version 1.0"),
+
+          const SizedBox(height: 10),
+
+          Card(
+            child: SwitchListTile(
+              secondary: const Icon(
+                Icons.notifications,
+                color: Colors.orange,
+              ),
+              title: const Text("Notifications"),
+              subtitle: const Text(
+                "Receive trading and market alerts",
+              ),
+              value: _notifications,
+              onChanged: (value) {
+                setState(() {
+                  _notifications = value;
+                });
+              },
+            ),
           ),
+
+          const SizedBox(height: 25),
+
+          const Text(
+            "Account & Security",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Card(
+            child: ListTile(
+              leading: const Icon(
+                Icons.lock,
+                color: Colors.purple,
+              ),
+              title: const Text("Security"),
+              subtitle: const Text(
+                "Password and account security",
+              ),
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+              ),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      "Security settings will be added later.",
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 25),
+
+          const Text(
+            "About",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Card(
+            child: ListTile(
+              leading: const Icon(
+                Icons.info_outline,
+                color: Colors.amber,
+              ),
+              title: const Text("About Jibwis AI"),
+              subtitle: const Text(
+                "Version 1.0.0",
+              ),
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+              ),
+              onTap: _showAboutDialog,
+            ),
+          ),
+
+          const SizedBox(height: 25),
+
+          Card(
+            color: Colors.red.withValues(alpha: 0.08),
+            child: ListTile(
+              leading: const Icon(
+                Icons.logout,
+                color: Colors.redAccent,
+              ),
+              title: const Text(
+                "Logout",
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: const Text(
+                "Sign out of your Jibwis AI account",
+              ),
+              onTap: _showLogoutDialog,
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          const Center(
+            child: Text(
+              "Jibwis AI • Version 1.0.0",
+              style: TextStyle(
+                color: Colors.white38,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
         ],
       ),
     );
