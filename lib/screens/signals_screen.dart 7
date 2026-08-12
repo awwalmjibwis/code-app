@@ -7,31 +7,294 @@ class SignalsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Trading Signals"),
+        title: const Text(
+          "Trading Signals",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: const [
-          Card(
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.green,
-                child: Icon(Icons.trending_up, color: Colors.white),
-              ),
-              title: Text("EUR/USD - BUY"),
-              subtitle: Text("Entry: 1.1050 | TP: 1.1100 | SL: 1.1020"),
+        children: [
+          const Text(
+            "Premium Signals",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 12),
+
+          const SizedBox(height: 6),
+
+          const Text(
+            "AI-powered trading ideas for the market.",
+            style: TextStyle(
+              color: Colors.white70,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          _signalCard(
+            symbol: "XAU/USD",
+            type: "BUY",
+            entry: "2450.80",
+            takeProfit: "2480.00",
+            stopLoss: "2435.00",
+            risk: "Medium Risk",
+            color: Colors.amber,
+            icon: Icons.trending_up,
+          ),
+
+          const SizedBox(height: 14),
+
+          _signalCard(
+            symbol: "EUR/USD",
+            type: "SELL",
+            entry: "1.1050",
+            takeProfit: "1.0980",
+            stopLoss: "1.1090",
+            risk: "Low Risk",
+            color: Colors.blue,
+            icon: Icons.trending_down,
+          ),
+
+          const SizedBox(height: 14),
+
+          _signalCard(
+            symbol: "GBP/USD",
+            type: "BUY",
+            entry: "1.2700",
+            takeProfit: "1.2780",
+            stopLoss: "1.2660",
+            risk: "Medium Risk",
+            color: Colors.purple,
+            icon: Icons.trending_up,
+          ),
+
+          const SizedBox(height: 14),
+
+          _signalCard(
+            symbol: "BTC/USD",
+            type: "BUY",
+            entry: "68420",
+            takeProfit: "71000",
+            stopLoss: "66500",
+            risk: "High Risk",
+            color: Colors.orange,
+            icon: Icons.currency_bitcoin,
+          ),
+
+          const SizedBox(height: 24),
+
           Card(
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.red,
-                child: Icon(Icons.trending_down, color: Colors.white),
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(18),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.amber,
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "Signals shown here are demo signals. "
+                      "Real-time AI signals will be connected later.",
+                      style: TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              title: Text("GBP/USD - SELL"),
-              subtitle: Text("Entry: 1.2700 | TP: 1.2650 | SL: 1.2730"),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  static Widget _signalCard({
+    required String symbol,
+    required String type,
+    required String entry,
+    required String takeProfit,
+    required String stopLoss,
+    required String risk,
+    required Color color,
+    required IconData icon,
+  }) {
+    final bool isBuy = type == "BUY";
+
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 27,
+                  backgroundColor: color,
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+
+                const SizedBox(width: 14),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        symbol,
+                        style: const TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Jibwis AI Signal",
+                        style: TextStyle(
+                          color: Colors.white60,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isBuy
+                        ? Colors.green.withValues(alpha: 0.15)
+                        : Colors.red.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    type,
+                    style: TextStyle(
+                      color: isBuy
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _infoBox(
+                    "Entry",
+                    entry,
+                    Colors.blue,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _infoBox(
+                    "Take Profit",
+                    takeProfit,
+                    Colors.green,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _infoBox(
+                    "Stop Loss",
+                    stopLoss,
+                    Colors.red,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            Row(
+              children: [
+                const Icon(
+                  Icons.warning_amber,
+                  color: Colors.amber,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  risk,
+                  style: const TextStyle(
+                    color: Colors.amber,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget _infoBox(
+    String title,
+    String value,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Colors.white60,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
