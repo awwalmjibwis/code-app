@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/main_navigation.dart';
+import 'screens/login_screen.dart';
 
 class JibwisAIApp extends StatelessWidget {
   const JibwisAIApp({super.key});
@@ -9,16 +9,36 @@ class JibwisAIApp extends StatelessWidget {
     return MaterialApp(
       title: 'Jibwis AI',
       debugShowCheckedModeBanner: false,
+
       theme: ThemeData(
         brightness: Brightness.dark,
         primaryColor: const Color(0xFF0D47A1),
         scaffoldBackgroundColor: const Color(0xFF121212),
+
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF0D47A1),
           brightness: Brightness.dark,
         ),
+
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Color(0xFF1E1E1E),
+        ),
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF0D47A1),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(12),
+              ),
+            ),
+          ),
+        ),
       ),
-      home: const MainNavigation(),
+
+      home: const LoginScreen(),
     );
   }
 }
