@@ -8,37 +8,15 @@ class RiskCalculatorScreen extends StatefulWidget {
       _RiskCalculatorScreenState();
 }
 
-class _RiskCalculatorScreenState extends State<RiskCalculatorScreen> {
+class _RiskCalculatorScreenState
+    extends State<RiskCalculatorScreen> {
   final TextEditingController _balanceController =
       TextEditingController();
 
   final TextEditingController _riskController =
       TextEditingController();
 
-  double _riskAmount = 0.0;
-
-  void _calculateRisk() {
-    final double? balance =
-        double.tryParse(_balanceController.text);
-
-    final double? risk =
-        double.tryParse(_riskController.text);
-
-    if (balance == null || risk == null || balance <= 0 || risk < 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Please enter valid balance and risk percentage.",
-          ),
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _riskAmount = balance * (risk / 100);
-    });
-  }
+  double? _riskAmount;
 
   @override
   void dispose() {
@@ -47,103 +25,238 @@ class _RiskCalculatorScreenState extends State<RiskCalculatorScreen> {
     super.dispose();
   }
 
+  void _calculateRisk() {
+    final balance =
+        double.tryParse(_balanceController.text.trim());
+
+    final riskPercent =
+        double.tryParse(_riskController.text.trim());
+
+    if (balance == null ||
+        riskPercent == null ||
+        balance <= 0 ||
+        riskPercent <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please enter valid account balance and risk percentage.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (riskPercent > 100) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Risk percentage cannot be greater than 100%.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _riskAmount = balance * riskPercent / 100;
+    });
+  }
+
+  void _clear() {
+    _balanceController.clear();
+    _riskController.clear();
+
+    setState(() {
+      _riskAmount = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Risk Calculator"),
+        title: const Text(
+          "Risk Calculator",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
+
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const Icon(
+            Icons.calculate,
+            size: 80,
+            color: Colors.amber,
+          ),
+
+          const SizedBox(height: 15),
+
           const Text(
-            "Calculate your maximum risk per trade.",
+            "Calculate Your Trading Risk",
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
+
+          const Text(
+            "Enter your account balance and the percentage "
+            "you want to risk on a trade.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white70,
+              height: 1.4,
+            ),
+          ),
+
+          const SizedBox(height: 30),
 
           TextField(
             controller: _balanceController,
-            keyboardType: const TextInputType.numberWithOptions(
+            keyboardType:
+                const TextInputType.numberWithOptions(
               decimal: true,
             ),
             decoration: const InputDecoration(
               labelText: "Account Balance",
               hintText: "Example: 1000",
               prefixText: "\$ ",
+              prefixIcon: Icon(Icons.account_balance_wallet),
               border: OutlineInputBorder(),
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
 
           TextField(
             controller: _riskController,
-            keyboardType: const TextInputType.numberWithOptions(
+            keyboardType:
+                const TextInputType.numberWithOptions(
               decimal: true,
             ),
             decoration: const InputDecoration(
               labelText: "Risk Percentage",
               hintText: "Example: 2",
               suffixText: "%",
+              prefixIcon: Icon(Icons.percent),
               border: OutlineInputBorder(),
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 25),
 
           SizedBox(
-            width: double.infinity,
+            height: 52,
             child: ElevatedButton.icon(
               onPressed: _calculateRisk,
               icon: const Icon(Icons.calculate),
-              label: const Text("Calculate Risk"),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Text(
-                    "Maximum Risk Amount",
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "\$${_riskAmount.toStringAsFixed(2)}",
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber,
-                    ),
-                  ),
-                ],
+              label: const Text(
+                "Calculate Risk",
+                style: TextStyle(fontSize: 16),
               ),
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+
+          SizedBox(
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: _clear,
+              icon: const Icon(Icons.clear),
+              label: const Text("Clear"),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          if (_riskAmount != null)
+            Card(
+              color: Colors.blue.withValues(alpha: 0.15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.shield,
+                      size: 50,
+                      color: Colors.green,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    const Text(
+                      "Maximum Risk Amount",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      "\$${_riskAmount!.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    const Text(
+                      "This is the maximum amount you "
+                      "would risk based on your settings.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 25),
 
           const Card(
             child: Padding(
               padding: EdgeInsets.all(16),
-              child: Text(
-                "Example: If your account balance is \$1,000 "
-                "and you risk 2%, your maximum risk is \$20.",
-                style: TextStyle(
-                  height: 1.5,
-                ),
+              child: Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.amber,
+                  ),
+
+                  SizedBox(width: 12),
+
+                  Expanded(
+                    child: Text(
+                      "Risk management is important in trading. "
+                      "Many traders choose to risk only a small "
+                      "percentage of their account on each trade.",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
