@@ -7,70 +7,253 @@ class MarketScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Live Market"),
+        title: const Text(
+          "Live Market",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: const [
+        children: [
+          const Text(
+            "Market Overview",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          const Text(
+            "Monitor major Forex & Crypto pairs.",
+            style: TextStyle(
+              color: Colors.white70,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          _marketCard(
+            symbol: "XAU/USD",
+            name: "Gold",
+            price: "\$2,450.80",
+            change: "+1.24%",
+            isBuy: true,
+            icon: Icons.workspace_premium,
+            color: Colors.amber,
+          ),
+
+          const SizedBox(height: 12),
+
+          _marketCard(
+            symbol: "EUR/USD",
+            name: "Euro vs Dollar",
+            price: "1.1050",
+            change: "-0.42%",
+            isBuy: false,
+            icon: Icons.currency_exchange,
+            color: Colors.blue,
+          ),
+
+          const SizedBox(height: 12),
+
+          _marketCard(
+            symbol: "GBP/USD",
+            name: "British Pound",
+            price: "1.2700",
+            change: "+0.68%",
+            isBuy: true,
+            icon: Icons.currency_pound,
+            color: Colors.purple,
+          ),
+
+          const SizedBox(height: 12),
+
+          _marketCard(
+            symbol: "BTC/USD",
+            name: "Bitcoin",
+            price: "\$68,420",
+            change: "+2.15%",
+            isBuy: true,
+            icon: Icons.currency_bitcoin,
+            color: Colors.orange,
+          ),
+
+          const SizedBox(height: 24),
+
           Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.show_chart,
-                color: Colors.amber,
-              ),
-              title: Text("XAU/USD"),
-              subtitle: Text("Gold"),
-              trailing: Text(
-                "BUY",
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Market Status",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  SizedBox(height: 15),
+
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.circle,
+                        color: Colors.green,
+                        size: 12,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        "Markets are active",
+                        style: TextStyle(
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 10),
+
+                  Text(
+                    "Prices shown are demo data. "
+                    "Live market API will be connected later.",
+                    style: TextStyle(
+                      color: Colors.white60,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          SizedBox(height: 12),
-
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.currency_exchange,
-                color: Colors.blue,
-              ),
-              title: Text("EUR/USD"),
-              subtitle: Text("Euro vs Dollar"),
-              trailing: Text(
-                "SELL",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(height: 12),
-
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.currency_bitcoin,
-                color: Colors.orange,
-              ),
-              title: Text("BTC/USD"),
-              subtitle: Text("Bitcoin"),
-              trailing: Text(
-                "BUY",
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  static Widget _marketCard({
+    required String symbol,
+    required String name,
+    required String price,
+    required String change,
+    required bool isBuy,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: color,
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+
+            const SizedBox(width: 15),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    symbol,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      color: Colors.white60,
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  Text(
+                    price,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  change,
+                  style: TextStyle(
+                    color: isBuy
+                        ? Colors.greenAccent
+                        : Colors.redAccent,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isBuy
+                        ? Colors.green.withValues(alpha: 0.15)
+                        : Colors.red.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    isBuy ? "BUY" : "SELL",
+                    style: TextStyle(
+                      color: isBuy
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
