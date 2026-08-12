@@ -14,18 +14,12 @@ class SignalsScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           const Text(
-            "Premium Signals",
+            "Latest Signals",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -35,7 +29,7 @@ class SignalsScreen extends StatelessWidget {
           const SizedBox(height: 6),
 
           const Text(
-            "AI-powered trading ideas for the market.",
+            "Trading ideas powered by Jibwis AI.",
             style: TextStyle(
               color: Colors.white70,
             ),
@@ -46,12 +40,12 @@ class SignalsScreen extends StatelessWidget {
           _signalCard(
             symbol: "XAU/USD",
             type: "BUY",
-            entry: "2450.80",
+            entry: "2455.00",
+            stopLoss: "2445.00",
             takeProfit: "2480.00",
-            stopLoss: "2435.00",
-            risk: "Medium Risk",
-            color: Colors.amber,
-            icon: Icons.trending_up,
+            risk: "Medium",
+            time: "10:30 AM",
+            color: Colors.green,
           ),
 
           const SizedBox(height: 14),
@@ -59,12 +53,12 @@ class SignalsScreen extends StatelessWidget {
           _signalCard(
             symbol: "EUR/USD",
             type: "SELL",
-            entry: "1.1050",
-            takeProfit: "1.0980",
-            stopLoss: "1.1090",
-            risk: "Low Risk",
-            color: Colors.blue,
-            icon: Icons.trending_down,
+            entry: "1.1690",
+            stopLoss: "1.1730",
+            takeProfit: "1.1620",
+            risk: "Low",
+            time: "09:45 AM",
+            color: Colors.red,
           ),
 
           const SizedBox(height: 14),
@@ -72,12 +66,12 @@ class SignalsScreen extends StatelessWidget {
           _signalCard(
             symbol: "GBP/USD",
             type: "BUY",
-            entry: "1.2700",
-            takeProfit: "1.2780",
-            stopLoss: "1.2660",
-            risk: "Medium Risk",
-            color: Colors.purple,
-            icon: Icons.trending_up,
+            entry: "1.3420",
+            stopLoss: "1.3370",
+            takeProfit: "1.3510",
+            risk: "Medium",
+            time: "08:30 AM",
+            color: Colors.green,
           ),
 
           const SizedBox(height: 14),
@@ -85,36 +79,35 @@ class SignalsScreen extends StatelessWidget {
           _signalCard(
             symbol: "BTC/USD",
             type: "BUY",
-            entry: "68420",
-            takeProfit: "71000",
-            stopLoss: "66500",
-            risk: "High Risk",
-            color: Colors.orange,
-            icon: Icons.currency_bitcoin,
+            entry: "118450",
+            stopLoss: "116800",
+            takeProfit: "122000",
+            risk: "High",
+            time: "07:15 AM",
+            color: Colors.green,
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           Card(
-            elevation: 5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
+            color: Colors.orange.withValues(alpha: 0.12),
             child: const Padding(
-              padding: EdgeInsets.all(18),
+              padding: EdgeInsets.all(16),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
-                    Icons.info_outline,
-                    color: Colors.amber,
+                    Icons.warning_amber,
+                    color: Colors.orange,
                   ),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      "Signals shown here are demo signals. "
-                      "Real-time AI signals will be connected later.",
+                      "Trading signals are for educational purposes. "
+                      "Always use proper risk management before entering a trade.",
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Colors.orange,
+                        height: 1.4,
                       ),
                     ),
                   ),
@@ -122,48 +115,43 @@ class SignalsScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  static Widget _signalCard({
+  Widget _signalCard({
     required String symbol,
     required String type,
     required String entry,
-    required String takeProfit,
     required String stopLoss,
+    required String takeProfit,
     required String risk,
+    required String time,
     required Color color,
-    required IconData icon,
   }) {
-    final bool isBuy = type == "BUY";
-
     return Card(
-      elevation: 6,
+      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 CircleAvatar(
-                  radius: 27,
                   backgroundColor: color,
                   child: Icon(
-                    icon,
+                    type == "BUY"
+                        ? Icons.trending_up
+                        : Icons.trending_down,
                     color: Colors.white,
-                    size: 28,
                   ),
                 ),
 
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
 
                 Expanded(
                   child: Column(
@@ -177,10 +165,9 @@ class SignalsScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        "Jibwis AI Signal",
-                        style: TextStyle(
+                      Text(
+                        time,
+                        style: const TextStyle(
                           color: Colors.white60,
                         ),
                       ),
@@ -191,20 +178,16 @@ class SignalsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
-                    vertical: 8,
+                    vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: isBuy
-                        ? Colors.green.withValues(alpha: 0.15)
-                        : Colors.red.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     type,
                     style: TextStyle(
-                      color: isBuy
-                          ? Colors.greenAccent
-                          : Colors.redAccent,
+                      color: color,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -212,32 +195,30 @@ class SignalsScreen extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
+
+            const Divider(),
+
+            const SizedBox(height: 10),
 
             Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: _infoBox(
-                    "Entry",
-                    entry,
-                    Colors.blue,
-                  ),
+                _infoItem(
+                  "Entry",
+                  entry,
+                  Icons.login,
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _infoBox(
-                    "Take Profit",
-                    takeProfit,
-                    Colors.green,
-                  ),
+                _infoItem(
+                  "Stop Loss",
+                  stopLoss,
+                  Icons.stop_circle_outlined,
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _infoBox(
-                    "Stop Loss",
-                    stopLoss,
-                    Colors.red,
-                  ),
+                _infoItem(
+                  "Take Profit",
+                  takeProfit,
+                  Icons.flag_outlined,
                 ),
               ],
             ),
@@ -247,15 +228,40 @@ class SignalsScreen extends StatelessWidget {
             Row(
               children: [
                 const Icon(
-                  Icons.warning_amber,
-                  color: Colors.amber,
+                  Icons.shield_outlined,
                   size: 20,
+                  color: Colors.amber,
                 ),
+
                 const SizedBox(width: 8),
+
+                const Text(
+                  "Risk:",
+                  style: TextStyle(
+                    color: Colors.white70,
+                  ),
+                ),
+
+                const SizedBox(width: 5),
+
                 Text(
                   risk,
-                  style: const TextStyle(
-                    color: Colors.amber,
+                  style: TextStyle(
+                    color: risk == "High"
+                        ? Colors.red
+                        : risk == "Medium"
+                            ? Colors.orange
+                            : Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const Spacer(),
+
+                Text(
+                  "Jibwis AI",
+                  style: TextStyle(
+                    color: Colors.amber.shade400,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -267,38 +273,38 @@ class SignalsScreen extends StatelessWidget {
     );
   }
 
-  static Widget _infoBox(
+  Widget _infoItem(
     String title,
     String value,
-    Color color,
+    IconData icon,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 11,
-              color: Colors.white60,
-            ),
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 18,
+          color: Colors.white54,
+        ),
+
+        const SizedBox(height: 5),
+
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 11,
+            color: Colors.white54,
           ),
-          const SizedBox(height: 5),
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+
+        const SizedBox(height: 3),
+
+        Text(
+          value,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
