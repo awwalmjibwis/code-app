@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../widgets/dashboard_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,109 +15,37 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_outlined),
-          ),
-        ],
       ),
-
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Welcome
           const Text(
-            "Welcome back 👋",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white70,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          const Text(
-            "Trade smarter with Jibwis AI",
+            "Welcome to Jibwis AI 🤖",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 20),
-
-          // Account Card
-          Card(
-            elevation: 4,
-            color: const Color(0xFF0D47A1),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Account Balance",
-                    style: TextStyle(
-                      color: Colors.white70,
-                    ),
-                  ),
-
-                  SizedBox(height: 8),
-
-                  Text(
-                    "\$10,000.00",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                  SizedBox(height: 12),
-
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.trending_up,
-                        color: Colors.greenAccent,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        "+2.45% Today",
-                        style: TextStyle(
-                          color: Colors.greenAccent,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
 
           const Text(
-            "Quick Access",
+            "Your smart trading assistant.",
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              color: Colors.white70,
+              fontSize: 15,
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 25),
 
           DashboardCard(
             icon: Icons.show_chart,
             title: "Live Market",
             subtitle:
-                "Track Forex, Gold and Crypto markets.",
+                "Track Forex & Crypto markets in real time.",
             color: Colors.green,
+            onTap: () {},
           ),
 
           const SizedBox(height: 12),
@@ -127,8 +54,9 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.campaign,
             title: "Premium Signals",
             subtitle:
-                "View BUY and SELL trading signals.",
+                "Receive high-quality trading signals.",
             color: Colors.orange,
+            onTap: () {},
           ),
 
           const SizedBox(height: 12),
@@ -137,8 +65,9 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.smart_toy,
             title: "AI Analysis",
             subtitle:
-                "Ask Jibwis AI to analyze the market.",
+                "Ask AI to analyze your trading ideas.",
             color: Colors.blue,
+            onTap: () {},
           ),
 
           const SizedBox(height: 12),
@@ -147,105 +76,54 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.school,
             title: "AI Academy",
             subtitle:
-                "Learn Forex and trading step by step.",
+                "Learn trading step by step.",
             color: Colors.purple,
+            onTap: () {},
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
 
-          const Text(
-            "Market Highlights",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.shield_outlined,
+                    color: Colors.amber,
+                    size: 32,
+                  ),
+
+                  const SizedBox(width: 14),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Trade With Risk Management",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Always protect your account and manage your risk.",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-
-          const SizedBox(height: 12),
-
-          _marketCard(
-            symbol: "XAU/USD",
-            name: "Gold",
-            price: "\$2,458.20",
-            change: "+1.25%",
-            isPositive: true,
-          ),
-
-          const SizedBox(height: 10),
-
-          _marketCard(
-            symbol: "EUR/USD",
-            name: "Euro / Dollar",
-            price: "1.1685",
-            change: "-0.42%",
-            isPositive: false,
-          ),
-
-          const SizedBox(height: 10),
-
-          _marketCard(
-            symbol: "BTC/USD",
-            name: "Bitcoin",
-            price: "\$118,450",
-            change: "+2.80%",
-            isPositive: true,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _marketCard({
-    required String symbol,
-    required String name,
-    required String price,
-    required String change,
-    required bool isPositive,
-  }) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor:
-              isPositive ? Colors.green : Colors.red,
-          child: Icon(
-            isPositive
-                ? Icons.trending_up
-                : Icons.trending_down,
-            color: Colors.white,
-          ),
-        ),
-
-        title: Text(
-          symbol,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
-        subtitle: Text(name),
-
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              price,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            Text(
-              change,
-              style: TextStyle(
-                color: isPositive
-                    ? Colors.green
-                    : Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
