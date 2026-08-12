@@ -1,61 +1,496 @@
 import 'package:flutter/material.dart';
 
-class ForexNewsScreen extends StatelessWidget {
+class ForexNewsScreen extends StatefulWidget {
   const ForexNewsScreen({super.key});
+
+  @override
+  State<ForexNewsScreen> createState() => _ForexNewsScreenState();
+}
+
+class _ForexNewsScreenState extends State<ForexNewsScreen> {
+  final TextEditingController _searchController =
+      TextEditingController();
+
+  String _selectedCategory = "All";
+
+  final List<Map<String, dynamic>> _news = [
+    {
+      "title": "Gold rises after US inflation data",
+      "description":
+          "Gold prices moved higher as inflation data came in lower than expected.",
+      "category": "Gold",
+      "currency": "XAU/USD",
+      "time": "10 min ago",
+      "icon": Icons.monetization_on,
+      "color": Colors.amber,
+      "important": true,
+    },
+    {
+      "title": "EUR gains strength against USD",
+      "description":
+          "The Euro strengthened after positive economic reports.",
+      "category": "Forex",
+      "currency": "EUR/USD",
+      "time": "25 min ago",
+      "icon": Icons.currency_exchange,
+      "color": Colors.blue,
+      "important": false,
+    },
+    {
+      "title": "Bitcoin breaks major resistance",
+      "description":
+          "BTC continues bullish momentum after strong buying pressure.",
+      "category": "Crypto",
+      "currency": "BTC/USD",
+      "time": "45 min ago",
+      "icon": Icons.currency_bitcoin,
+      "color": Colors.orange,
+      "important": true,
+    },
+    {
+      "title": "USD remains strong before Fed decision",
+      "description":
+          "The US Dollar remains firm as traders prepare for the next Federal Reserve decision.",
+      "category": "Forex",
+      "currency": "USD",
+      "time": "1 hour ago",
+      "icon": Icons.public,
+      "color": Colors.green,
+      "important": true,
+    },
+    {
+      "title": "GBP shows recovery against major currencies",
+      "description":
+          "The British Pound recovered after recent economic data improved market sentiment.",
+      "category": "Forex",
+      "currency": "GBP/USD",
+      "time": "2 hours ago",
+      "icon": Icons.trending_up,
+      "color": Colors.purple,
+      "important": false,
+    },
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _filteredNews {
+    final query = _searchController.text.toLowerCase().trim();
+
+    return _news.where((news) {
+      final matchesCategory =
+          _selectedCategory == "All" ||
+          news["category"] == _selectedCategory;
+
+      final matchesSearch =
+          query.isEmpty ||
+          news["title"].toString().toLowerCase().contains(query) ||
+          news["description"]
+              .toString()
+              .toLowerCase()
+              .contains(query) ||
+          news["currency"].toString().toLowerCase().contains(query);
+
+      return matchesCategory && matchesSearch;
+    }).toList();
+  }
+
+  void _openNews(Map<String, dynamic> news) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
+        ),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor:
+                          news["color"].withValues(alpha: 0.15),
+                      child: Icon(
+                        news["icon"],
+                        color: news["color"],
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        news["title"],
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  news["description"],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: Colors.white70,
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.currency_exchange,
+                      size: 18,
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      news["currency"],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    const Icon(
+                      Icons.access_time,
+                      size: 18,
+                      color: Colors.white54,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      news["time"],
+                      style: const TextStyle(
+                        color: Colors.white54,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                if (news["important"] == true)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.warning_amber,
+                          color: Colors.redAccent,
+                          size: 18,
+                        ),
+                        SizedBox(width: 7),
+                        Text(
+                          "Important Market News",
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: 20),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Close"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Forex News"),
+        title: const Text(
+          "Forex News",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.newspaper,
-                color: Colors.blue,
-              ),
-              title: Text("Gold rises after US inflation data"),
-              subtitle: Text(
-                "Gold prices moved higher as inflation data came in lower than expected.",
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              8,
+            ),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (_) {
+                setState(() {});
+              },
+              decoration: InputDecoration(
+                hintText: "Search news...",
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
             ),
           ),
 
-          SizedBox(height: 12),
-
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.public,
-                color: Colors.green,
+          SizedBox(
+            height: 55,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
               ),
-              title: Text("EUR gains strength against USD"),
-              subtitle: Text(
-                "The Euro strengthened after positive economic reports.",
-              ),
+              children: [
+                _categoryChip("All"),
+                _categoryChip("Forex"),
+                _categoryChip("Gold"),
+                _categoryChip("Crypto"),
+              ],
             ),
           ),
 
-          SizedBox(height: 12),
+          Expanded(
+            child: _filteredNews.isEmpty
+                ? _emptyState()
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(
+                      16,
+                      8,
+                      16,
+                      20,
+                    ),
+                    itemCount: _filteredNews.length,
+                    itemBuilder: (context, index) {
+                      final news = _filteredNews[index];
 
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.currency_bitcoin,
-                color: Colors.orange,
-              ),
-              title: Text("Bitcoin breaks major resistance"),
-              subtitle: Text(
-                "BTC continues bullish momentum after strong buying pressure.",
-              ),
-            ),
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: 12),
+                        child: _newsCard(news),
+                      );
+                    },
+                  ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _categoryChip(String category) {
+    final selected = _selectedCategory == category;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(category),
+        selected: selected,
+        onSelected: (_) {
+          setState(() {
+            _selectedCategory = category;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _newsCard(Map<String, dynamic> news) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => _openNews(news),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 27,
+                backgroundColor:
+                    news["color"].withValues(alpha: 0.15),
+                child: Icon(
+                  news["icon"],
+                  color: news["color"],
+                  size: 28,
+                ),
+              ),
+
+              const SizedBox(width: 14),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            news["title"],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (news["important"] == true)
+                          const Icon(
+                            Icons.local_fire_department,
+                            color: Colors.redAccent,
+                            size: 20,
+                          ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 7),
+
+                    Text(
+                      news["description"],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        height: 1.35,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Row(
+                      children: [
+                        Container(
+                          padding:
+                              const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withValues(
+                              alpha: 0.12,
+                            ),
+                            borderRadius:
+                                BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            news["currency"],
+                            style: const TextStyle(
+                              color: Colors.lightBlueAccent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        const Icon(
+                          Icons.access_time,
+                          size: 14,
+                          color: Colors.white38,
+                        ),
+
+                        const SizedBox(width: 4),
+
+                        Text(
+                          news["time"],
+                          style: const TextStyle(
+                            color: Colors.white38,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _emptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 80,
+              color: Colors.white.withValues(alpha: 0.25),
+            ),
+            const SizedBox(height: 18),
+            const Text(
+              "No News Found",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Try another search or category.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white54,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
