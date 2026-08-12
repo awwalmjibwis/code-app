@@ -31,10 +31,12 @@ class _JournalScreenState extends State<JournalScreen> {
                   children: [
                     TextField(
                       controller: symbolController,
-                      textCapitalization: TextCapitalization.characters,
+                      textCapitalization:
+                          TextCapitalization.characters,
                       decoration: const InputDecoration(
                         labelText: "Symbol",
-                        hintText: "Example: EUR/USD",
+                        hintText: "Example: XAU/USD",
+                        prefixIcon: Icon(Icons.currency_exchange),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -42,9 +44,10 @@ class _JournalScreenState extends State<JournalScreen> {
                     const SizedBox(height: 12),
 
                     DropdownButtonFormField<String>(
-                      value: tradeType,
+                      initialValue: tradeType,
                       decoration: const InputDecoration(
                         labelText: "Trade Type",
+                        prefixIcon: Icon(Icons.swap_vert),
                         border: OutlineInputBorder(),
                       ),
                       items: const [
@@ -76,6 +79,7 @@ class _JournalScreenState extends State<JournalScreen> {
                       ),
                       decoration: const InputDecoration(
                         labelText: "Entry Price",
+                        prefixIcon: Icon(Icons.login),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -90,6 +94,7 @@ class _JournalScreenState extends State<JournalScreen> {
                       ),
                       decoration: const InputDecoration(
                         labelText: "Exit Price",
+                        prefixIcon: Icon(Icons.logout),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -107,6 +112,7 @@ class _JournalScreenState extends State<JournalScreen> {
                         labelText: "Profit / Loss",
                         hintText: "Example: 120 or -45",
                         prefixText: "\$ ",
+                        prefixIcon: Icon(Icons.attach_money),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -120,7 +126,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   },
                   child: const Text("Cancel"),
                 ),
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: () {
                     final symbol =
                         symbolController.text.trim().toUpperCase();
@@ -166,7 +172,8 @@ class _JournalScreenState extends State<JournalScreen> {
 
                     Navigator.pop(dialogContext);
                   },
-                  child: const Text("Save Trade"),
+                  icon: const Icon(Icons.save),
+                  label: const Text("Save Trade"),
                 ),
               ],
             );
@@ -176,111 +183,343 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  void _deleteTrade(int index) {
-    setState(() {
-      _trades.removeAt(index);
-    });
+  Future<void> _deleteTrade(int index) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Trade?"),
+          content: const Text(
+            "Are you sure you want to delete this trade?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      setState(() {
+        _trades.removeAt(index);
+      });
+    }
+  }
+
+  double get _totalProfit {
+    return _trades.fold(
+      0,
+      (total, trade) => total + trade.profitLoss,
+    );
+  }
+
+  int get _winningTrades {
+    return _trades
+        .where((trade) => trade.profitLoss > 0)
+        .length;
+  }
+
+  int get _losingTrades {
+    return _trades
+        .where((trade) => trade.profitLoss < 0)
+        .length;
   }
 
   @override
   Widget build(BuildContext context) {
+    final isOverallProfit = _totalProfit >= 0;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Trading Journal"),
+        title: const Text(
+          "Trading Journal",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
-      body: _trades.isEmpty
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.book_outlined,
-                      size: 70,
-                      color: Colors.amber,
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      "No trades yet",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Tap the + button to add your first trade.",
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+      body: Column(
+        children: [
+          if (_trades.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                8,
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _trades.length,
-              itemBuilder: (context, index) {
-                final trade = _trades[index];
+              child: _buildSummaryCard(isOverallProfit),
+            ),
 
-                final isProfit = trade.profitLoss >= 0;
+          Expanded(
+            child: _trades.isEmpty
+                ? _buildEmptyState()
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(
+                      16,
+                      8,
+                      16,
+                      100,
+                    ),
+                    itemCount: _trades.length,
+                    itemBuilder: (context, index) {
+                      return _buildTradeCard(
+                        _trades[index],
+                        index,
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddTradeDialog,
+        icon: const Icon(Icons.add),
+        label: const Text("Add Trade"),
+      ),
+    );
+  }
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor:
-                          trade.type == "BUY"
-                              ? Colors.green
-                              : Colors.red,
-                      child: Icon(
-                        trade.type == "BUY"
-                            ? Icons.trending_up
-                            : Icons.trending_down,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      "${trade.symbol} - ${trade.type}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      "Entry: ${trade.entry}\n"
-                      "Exit: ${trade.exit}\n"
-                      "Date: ${_formatDate(trade.date)}",
-                    ),
-                    isThreeLine: true,
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "${isProfit ? '+' : ''}\$${trade.profitLoss.toStringAsFixed(2)}",
-                          style: TextStyle(
-                            color: isProfit
-                                ? Colors.green
-                                : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            size: 20,
-                          ),
-                          onPressed: () => _deleteTrade(index),
-                        ),
-                      ],
+  Widget _buildSummaryCard(bool isProfit) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          children: [
+            const Row(
+              children: [
+                Icon(
+                  Icons.analytics,
+                  color: Colors.amber,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  "Trading Summary",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 18),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _summaryItem(
+                    "Total P/L",
+                    "${isProfit ? '+' : ''}\$"
+                        "${_totalProfit.toStringAsFixed(2)}",
+                    isProfit ? Colors.green : Colors.red,
+                  ),
+                ),
+                Expanded(
+                  child: _summaryItem(
+                    "Trades",
+                    "${_trades.length}",
+                    Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _summaryItem(
+                    "Wins",
+                    "$_winningTrades",
+                    Colors.green,
+                  ),
+                ),
+                Expanded(
+                  child: _summaryItem(
+                    "Losses",
+                    "$_losingTrades",
+                    Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _summaryItem(
+    String title,
+    String value,
+    Color color,
+  ) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white60,
+            fontSize: 13,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 19,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.book_outlined,
+              size: 75,
+              color: Colors.amber,
+            ),
+            SizedBox(height: 18),
+            Text(
+              "No trades yet",
+              style: TextStyle(
+                fontSize: 23,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              "Tap the Add Trade button to record "
+              "your first trade.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white60,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTradeCard(
+    TradeEntry trade,
+    int index,
+  ) {
+    final isProfit = trade.profitLoss >= 0;
+    final isBuy = trade.type == "BUY";
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 26,
+              backgroundColor:
+                  isBuy ? Colors.green : Colors.red,
+              child: Icon(
+                isBuy
+                    ? Icons.trending_up
+                    : Icons.trending_down,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(width: 14),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${trade.symbol} - ${trade.type}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
-                );
-              },
+
+                  const SizedBox(height: 6),
+
+                  Text(
+                    "Entry: ${trade.entry}\n"
+                    "Exit: ${trade.exit}\n"
+                    "Date: ${_formatDate(trade.date)}",
+                    style: const TextStyle(
+                      color: Colors.white60,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddTradeDialog,
-        child: const Icon(Icons.add),
+
+            const SizedBox(width: 8),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  "${isProfit ? '+' : ''}\$"
+                  "${trade.profitLoss.toStringAsFixed(2)}",
+                  style: TextStyle(
+                    color:
+                        isProfit ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+
+                IconButton(
+                  tooltip: "Delete trade",
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent,
+                    size: 21,
+                  ),
+                  onPressed: () => _deleteTrade(index),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
