@@ -12,27 +12,34 @@ class JibwisAIApp extends StatelessWidget {
 
       theme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: const Color(0xFF0D47A1),
-        scaffoldBackgroundColor: const Color(0xFF121212),
+        scaffoldBackgroundColor:
+            const Color(0xFF121212),
 
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF0D47A1),
           brightness: Brightness.dark,
         ),
 
-        inputDecorationTheme: const InputDecorationTheme(
-          filled: true,
-          fillColor: Color(0xFF1E1E1E),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF121212),
+          foregroundColor: Colors.white,
+          elevation: 0,
         ),
 
-        elevatedButtonTheme: ElevatedButtonThemeData(
+        inputDecorationTheme:
+            const InputDecorationTheme(
+          filled: true,
+          fillColor: Color(0xFF1E1E1E),
+          border: OutlineInputBorder(),
+        ),
+
+        elevatedButtonTheme:
+            ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF0D47A1),
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(12),
-              ),
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
