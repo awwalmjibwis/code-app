@@ -27,34 +27,52 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+
+        onDestinationSelected: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+
+        backgroundColor: const Color(0xFF181818),
+
+        indicatorColor: const Color(0xFF0D47A1),
+
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart),
+
+          NavigationDestination(
+            icon: Icon(Icons.show_chart_outlined),
+            selectedIcon: Icon(Icons.show_chart),
             label: 'Market',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.campaign),
+
+          NavigationDestination(
+            icon: Icon(Icons.campaign_outlined),
+            selectedIcon: Icon(Icons.campaign),
             label: 'Signals',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.smart_toy),
+
+          NavigationDestination(
+            icon: Icon(Icons.smart_toy_outlined),
+            selectedIcon: Icon(Icons.smart_toy),
             label: 'AI',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
