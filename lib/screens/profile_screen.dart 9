@@ -7,7 +7,6 @@ import 'lot_size_calculator_screen.dart';
 import 'economic_calendar_screen.dart';
 import 'forex_news_screen.dart';
 import 'notifications_screen.dart';
-import 'login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -24,22 +23,16 @@ class ProfileScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const SizedBox(height: 10),
-
-          // Profile Avatar
-          const Center(
-            child: CircleAvatar(
-              radius: 55,
-              backgroundColor: Colors.amber,
-              child: Icon(
-                Icons.person,
-                size: 60,
-                color: Colors.black,
-              ),
+          const CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.amber,
+            child: Icon(
+              Icons.person,
+              size: 50,
+              color: Colors.black,
             ),
           ),
 
@@ -47,9 +40,9 @@ class ProfileScreen extends StatelessWidget {
 
           const Center(
             child: Text(
-              "Jibwis AI Trader",
+              "Welcome to Jibwis AI",
               style: TextStyle(
-                fontSize: 23,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -59,200 +52,94 @@ class ProfileScreen extends StatelessWidget {
 
           const Center(
             child: Text(
-              "trader@jibwisai.com",
+              "Your trading journey starts here.",
               style: TextStyle(
-                color: Colors.white60,
+                color: Colors.white70,
               ),
             ),
           ),
 
           const SizedBox(height: 25),
 
-          // Plan Card
           Card(
-            color: const Color(0xFF0D47A1),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(18),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.amber,
-                    child: Icon(
-                      Icons.workspace_premium,
-                      color: Colors.black,
-                    ),
+            child: Column(
+              children: const [
+                ListTile(
+                  leading: Icon(Icons.email),
+                  title: Text("Email"),
+                  subtitle: Text("Not logged in"),
+                ),
+                Divider(height: 1),
+                ListTile(
+                  leading: Icon(
+                    Icons.workspace_premium,
+                    color: Colors.amber,
                   ),
-
-                  SizedBox(width: 14),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Free Plan",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        SizedBox(height: 4),
-
-                        Text(
-                          "Upgrade to VIP for more features.",
-                          style: TextStyle(
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  title: Text("VIP Status"),
+                  subtitle: Text("Free Plan"),
+                ),
+              ],
             ),
           ),
 
-          const SizedBox(height: 25),
+          const SizedBox(height: 12),
 
-          const Text(
-            "Trading Tools",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+          _profileItem(
+            context,
+            icon: Icons.settings,
+            title: "Settings",
+            page: const SettingsScreen(),
           ),
 
-          const SizedBox(height: 10),
-
-          _menuItem(
+          _profileItem(
             context,
             icon: Icons.book,
             title: "Trading Journal",
-            subtitle: "Record and manage your trades",
             page: const JournalScreen(),
           ),
 
-          _menuItem(
+          _profileItem(
             context,
             icon: Icons.calculate,
             title: "Risk Calculator",
-            subtitle: "Calculate your trading risk",
             page: const RiskCalculatorScreen(),
           ),
 
-          _menuItem(
+          _profileItem(
             context,
             icon: Icons.straighten,
             title: "Lot Size Calculator",
-            subtitle: "Calculate recommended lot size",
             page: const LotSizeCalculatorScreen(),
           ),
 
-          _menuItem(
+          _profileItem(
             context,
             icon: Icons.calendar_month,
             title: "Economic Calendar",
-            subtitle: "Check important economic events",
             page: const EconomicCalendarScreen(),
           ),
 
-          _menuItem(
+          _profileItem(
             context,
             icon: Icons.newspaper,
             title: "Forex News",
-            subtitle: "Latest Forex and Crypto news",
             page: const ForexNewsScreen(),
           ),
 
-          _menuItem(
+          _profileItem(
             context,
             icon: Icons.notifications,
             title: "Notifications",
-            subtitle: "View your latest notifications",
             page: const NotificationsScreen(),
           ),
 
           const SizedBox(height: 20),
 
-          const Text(
-            "Account",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          ListTile(
-            leading: const CircleAvatar(
-              backgroundColor: Colors.blue,
-              child: Icon(
-                Icons.settings,
-                color: Colors.white,
-              ),
-            ),
-            title: const Text(
-              "Settings",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: const Text(
-              "App preferences and settings",
-            ),
-            trailing: const Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      const SettingsScreen(),
-                ),
-              );
-            },
-          ),
-
-          const Divider(),
-
-          ListTile(
-            leading: const CircleAvatar(
-              backgroundColor: Colors.red,
-              child: Icon(
-                Icons.logout,
-                color: Colors.white,
-              ),
-            ),
-            title: const Text(
-              "Logout",
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: const Text(
-              "Sign out of your account",
-            ),
-            onTap: () {
-              _showLogoutDialog(context);
-            },
-          ),
-
-          const SizedBox(height: 25),
-
           const Center(
             child: Text(
               "Jibwis AI • Version 1.0",
               style: TextStyle(
-                color: Colors.white38,
+                color: Colors.white54,
               ),
             ),
           ),
@@ -263,85 +150,30 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _menuItem(
+  static Widget _profileItem(
     BuildContext context, {
     required IconData icon,
     required String title,
-    required String subtitle,
     required Widget page,
   }) {
-    return Column(
-      children: [
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 4,
-          ),
-          leading: CircleAvatar(
-            backgroundColor: Colors.white10,
-            child: Icon(
-              icon,
-              color: Colors.amber,
-            ),
-          ),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          subtitle: Text(subtitle),
-          trailing: const Icon(
-            Icons.arrow_forward_ios,
-            size: 16,
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => page,
-              ),
-            );
-          },
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
         ),
-        const Divider(),
-      ],
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text("Logout"),
-          content: const Text(
-            "Are you sure you want to logout?",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text("Cancel"),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => page,
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const LoginScreen(),
-                  ),
-                  (route) => false,
-                );
-              },
-              child: const Text("Logout"),
-            ),
-          ],
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
