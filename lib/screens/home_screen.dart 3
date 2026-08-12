@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+aimport 'package:flutter/material.dart';
 import '../widgets/dashboard_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -8,39 +8,294 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Jibwis AI"),
+        title: const Text(
+          "Jibwis AI",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: const [
+        children: [
+          // Welcome Section
+          const Text(
+            "Welcome back 👋",
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          const Text(
+            "Your smart trading assistant",
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 15,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Account Card
+          Card(
+            elevation: 6,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF0D47A1),
+                    Color(0xFF1565C0),
+                  ],
+                ),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Account Balance",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "\$10,000.00",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.trending_up,
+                        color: Colors.greenAccent,
+                        size: 20,
+                      ),
+                      SizedBox(width: 6),
+                      Text(
+                        "+5.24% This Month",
+                        style: TextStyle(
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Quick Actions
+          const Text(
+            "Quick Actions",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
           DashboardCard(
             icon: Icons.show_chart,
             title: "Live Market",
-            subtitle: "Track Forex & Crypto markets in real time.",
+            subtitle:
+                "Track Forex & Crypto markets in real time.",
             color: Colors.green,
           ),
-          SizedBox(height: 12),
+
+          const SizedBox(height: 12),
+
           DashboardCard(
             icon: Icons.campaign,
             title: "Premium Signals",
-            subtitle: "Receive high-quality trading signals.",
+            subtitle:
+                "Receive high-quality trading signals.",
             color: Colors.orange,
           ),
-          SizedBox(height: 12),
+
+          const SizedBox(height: 12),
+
           DashboardCard(
             icon: Icons.smart_toy,
             title: "AI Analysis",
-            subtitle: "Ask AI to analyze any trading chart.",
+            subtitle:
+                "Ask Jibwis AI to analyze your market.",
             color: Colors.blue,
           ),
-          SizedBox(height: 12),
+
+          const SizedBox(height: 12),
+
           DashboardCard(
             icon: Icons.school,
             title: "AI Academy",
-            subtitle: "Learn trading step by step.",
+            subtitle:
+                "Learn trading step by step.",
             color: Colors.purple,
           ),
+
+          const SizedBox(height: 20),
+
+          // Market Overview
+          const Text(
+            "Market Overview",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Card(
+            child: ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Colors.green,
+                child: Icon(
+                  Icons.trending_up,
+                  color: Colors.white,
+                ),
+              ),
+              title: const Text("XAU/USD"),
+              subtitle: const Text("Gold"),
+              trailing: const Text(
+                "BUY",
+                style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Card(
+            child: ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Colors.red,
+                child: Icon(
+                  Icons.trending_down,
+                  color: Colors.white,
+                ),
+              ),
+              title: const Text("EUR/USD"),
+              subtitle: const Text("Euro vs Dollar"),
+              trailing: const Text(
+                "SELL",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Card(
+            child: ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Colors.orange,
+                child: Icon(
+                  Icons.currency_bitcoin,
+                  color: Colors.white,
+                ),
+              ),
+              title: const Text("BTC/USD"),
+              subtitle: const Text("Bitcoin"),
+              trailing: const Text(
+                "BUY",
+                style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // AI Assistant Banner
+          Card(
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.amber,
+                    child: Icon(
+                      Icons.smart_toy,
+                      color: Colors.black,
+                      size: 32,
+                    ),
+                  ),
+
+                  const SizedBox(width: 15),
+
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Jibwis AI Assistant",
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Need help with your trading?",
+                          style: TextStyle(
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 18,
+                    ),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
         ],
       ),
     );
