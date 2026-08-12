@@ -14,12 +14,6 @@ class MarketScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -27,15 +21,15 @@ class MarketScreen extends StatelessWidget {
           const Text(
             "Market Overview",
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
           const Text(
-            "Track major Forex, Gold and Crypto markets.",
+            "Monitor major Forex, Gold and Crypto instruments.",
             style: TextStyle(
               color: Colors.white70,
             ),
@@ -43,130 +37,76 @@ class MarketScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.green.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.green.withValues(alpha: 0.25),
-              ),
-            ),
-            child: const Row(
-              children: [
-                CircleAvatar(
-                  radius: 7,
-                  backgroundColor: Colors.green,
-                ),
-                SizedBox(width: 10),
-                Text(
-                  "Market Open",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  "Live",
-                  style: TextStyle(
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
           _marketCard(
             symbol: "XAU/USD",
-            name: "Gold / US Dollar",
-            price: "\$2,458.20",
+            name: "Gold",
+            price: "2,350.50",
             change: "+1.25%",
             isPositive: true,
-            icon: Icons.circle,
-            iconColor: Colors.amber,
+            icon: Icons.monetization_on,
+            color: Colors.amber,
           ),
-
-          const SizedBox(height: 12),
 
           _marketCard(
             symbol: "EUR/USD",
             name: "Euro / US Dollar",
-            price: "1.1685",
-            change: "+0.32%",
+            price: "1.0850",
+            change: "+0.42%",
             isPositive: true,
-            icon: Icons.euro,
-            iconColor: Colors.blue,
+            icon: Icons.currency_exchange,
+            color: Colors.blue,
           ),
-
-          const SizedBox(height: 12),
 
           _marketCard(
             symbol: "GBP/USD",
             name: "British Pound / US Dollar",
-            price: "1.3420",
-            change: "-0.48%",
+            price: "1.2740",
+            change: "-0.31%",
             isPositive: false,
             icon: Icons.currency_pound,
-            iconColor: Colors.purple,
+            color: Colors.purple,
           ),
-
-          const SizedBox(height: 12),
 
           _marketCard(
             symbol: "USD/JPY",
             name: "US Dollar / Japanese Yen",
-            price: "147.85",
-            change: "-0.21%",
-            isPositive: false,
+            price: "149.80",
+            change: "+0.18%",
+            isPositive: true,
             icon: Icons.currency_yen,
-            iconColor: Colors.orange,
+            color: Colors.green,
           ),
-
-          const SizedBox(height: 12),
 
           _marketCard(
             symbol: "BTC/USD",
-            name: "Bitcoin / US Dollar",
-            price: "\$118,450",
-            change: "+2.80%",
+            name: "Bitcoin",
+            price: "67,450.00",
+            change: "+2.10%",
             isPositive: true,
             icon: Icons.currency_bitcoin,
-            iconColor: Colors.orange,
-          ),
-
-          const SizedBox(height: 12),
-
-          _marketCard(
-            symbol: "ETH/USD",
-            name: "Ethereum / US Dollar",
-            price: "\$4,320",
-            change: "+1.74%",
-            isPositive: true,
-            icon: Icons.currency_exchange,
-            iconColor: Colors.deepPurple,
+            color: Colors.orange,
           ),
 
           const SizedBox(height: 20),
 
-          Card(
-            color: Colors.blue.withValues(alpha: 0.10),
-            child: const Padding(
+          const Card(
+            child: Padding(
               padding: EdgeInsets.all(16),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: Colors.blue,
+                    color: Colors.amber,
                   ),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      "Market prices shown here are demo data. "
-                      "Live market API integration will be connected later.",
+                      "Market prices shown here are demo data "
+                      "for the current app version. Real-time "
+                      "market prices can be connected through "
+                      "a market API later.",
                       style: TextStyle(
                         color: Colors.white70,
                         height: 1.4,
@@ -189,28 +129,25 @@ class MarketScreen extends StatelessWidget {
     required String change,
     required bool isPositive,
     required IconData icon,
-    required Color iconColor,
+    required Color color,
   }) {
     final changeColor =
         isPositive ? Colors.green : Colors.red;
 
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             CircleAvatar(
-              radius: 25,
+              radius: 27,
               backgroundColor:
-                  iconColor.withValues(alpha: 0.15),
+                  color.withValues(alpha: 0.15),
               child: Icon(
                 icon,
-                color: iconColor,
-                size: 25,
+                color: color,
+                size: 28,
               ),
             ),
 
@@ -224,16 +161,18 @@ class MarketScreen extends StatelessWidget {
                   Text(
                     symbol,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+
+                  const SizedBox(height: 5),
+
                   Text(
                     name,
                     style: const TextStyle(
+                      color: Colors.white60,
                       fontSize: 12,
-                      color: Colors.white54,
                     ),
                   ),
                 ],
@@ -247,32 +186,18 @@ class MarketScreen extends StatelessWidget {
                 Text(
                   price,
                   style: const TextStyle(
-                    fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
 
                 const SizedBox(height: 5),
 
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: changeColor.withValues(
-                      alpha: 0.12,
-                    ),
-                    borderRadius:
-                        BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    change,
-                    style: TextStyle(
-                      color: changeColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
+                Text(
+                  change,
+                  style: TextStyle(
+                    color: changeColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
