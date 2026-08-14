@@ -48,4 +48,4 @@ class JibwisAIApp extends StatelessWidget {
       home: const SplashScreen(),
     );
   }
-}
+} 
