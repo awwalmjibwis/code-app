@@ -1,7 +1,101 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-class MarketScreen extends StatelessWidget {
+class MarketScreen extends StatefulWidget {
   const MarketScreen({super.key});
+
+  @override
+  State<MarketScreen> createState() => _MarketScreenState();
+}
+
+class _MarketScreenState extends State<MarketScreen> {
+  bool _isRefreshing = false;
+  DateTime _lastUpdated = DateTime.now();
+
+  final List<MarketItem> _markets = [
+    MarketItem(
+      symbol: "XAU/USD",
+      name: "Gold",
+      price: "2,350.50",
+      change: "+1.25%",
+      isPositive: true,
+      icon: Icons.monetization_on,
+      color: Colors.amber,
+    ),
+    MarketItem(
+      symbol: "EUR/USD",
+      name: "Euro / US Dollar",
+      price: "1.0850",
+      change: "+0.42%",
+      isPositive: true,
+      icon: Icons.currency_exchange,
+      color: Colors.blue,
+    ),
+    MarketItem(
+      symbol: "GBP/USD",
+      name: "British Pound / US Dollar",
+      price: "1.2740",
+      change: "-0.31%",
+      isPositive: false,
+      icon: Icons.currency_pound,
+      color: Colors.purple,
+    ),
+    MarketItem(
+      symbol: "USD/JPY",
+      name: "US Dollar / Japanese Yen",
+      price: "149.80",
+      change: "+0.18%",
+      isPositive: true,
+      icon: Icons.currency_yen,
+      color: Colors.green,
+    ),
+    MarketItem(
+      symbol: "BTC/USD",
+      name: "Bitcoin",
+      price: "67,450.00",
+      change: "+2.10%",
+      isPositive: true,
+      icon: Icons.currency_bitcoin,
+      color: Colors.orange,
+    ),
+  ];
+
+  Future<void> _refreshMarket() async {
+    if (_isRefreshing) return;
+
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    await Future.delayed(
+      const Duration(seconds: 1),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _lastUpdated = DateTime.now();
+      _isRefreshing = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Market data refreshed.",
+        ),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  String _formatTime(DateTime time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    final second = time.second.toString().padLeft(2, '0');
+
+    return "$hour:$minute:$second";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,128 +108,148 @@ class MarketScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: "Refresh",
+            onPressed: _isRefreshing
+                ? null
+                : _refreshMarket,
+            icon: _isRefreshing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Icon(
+                    Icons.refresh,
+                  ),
+          ),
+        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const Text(
-            "Market Overview",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+      body: RefreshIndicator(
+        onRefresh: _refreshMarket,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          children: [
+            _marketHeader(),
+
+            const SizedBox(height: 20),
+
+            ..._markets.map(
+              (market) => _marketCard(market),
             ),
-          ),
 
-          const SizedBox(height: 8),
+            const SizedBox(height: 8),
 
-          const Text(
-            "Monitor major Forex, Gold and Crypto instruments.",
-            style: TextStyle(
-              color: Colors.white70,
+            _marketStatus(),
+
+            const SizedBox(height: 16),
+
+            _infoCard(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _marketHeader() {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(
+                  alpha: 0.15,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.show_chart,
+                color: Colors.green,
+                size: 30,
+              ),
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(width: 14),
 
-          _marketCard(
-            symbol: "XAU/USD",
-            name: "Gold",
-            price: "2,350.50",
-            change: "+1.25%",
-            isPositive: true,
-            icon: Icons.monetization_on,
-            color: Colors.amber,
-          ),
-
-          _marketCard(
-            symbol: "EUR/USD",
-            name: "Euro / US Dollar",
-            price: "1.0850",
-            change: "+0.42%",
-            isPositive: true,
-            icon: Icons.currency_exchange,
-            color: Colors.blue,
-          ),
-
-          _marketCard(
-            symbol: "GBP/USD",
-            name: "British Pound / US Dollar",
-            price: "1.2740",
-            change: "-0.31%",
-            isPositive: false,
-            icon: Icons.currency_pound,
-            color: Colors.purple,
-          ),
-
-          _marketCard(
-            symbol: "USD/JPY",
-            name: "US Dollar / Japanese Yen",
-            price: "149.80",
-            change: "+0.18%",
-            isPositive: true,
-            icon: Icons.currency_yen,
-            color: Colors.green,
-          ),
-
-          _marketCard(
-            symbol: "BTC/USD",
-            name: "Bitcoin",
-            price: "67,450.00",
-            change: "+2.10%",
-            isPositive: true,
-            icon: Icons.currency_bitcoin,
-            color: Colors.orange,
-          ),
-
-          const SizedBox(height: 20),
-
-          const Card(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
+            const Expanded(
+              child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.amber,
+                  Text(
+                    "Market Overview",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      "Market prices shown here are demo data "
-                      "for the current app version. Real-time "
-                      "market prices can be connected through "
-                      "a market API later.",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        height: 1.4,
-                      ),
+                  SizedBox(height: 5),
+                  Text(
+                    "Forex, Gold & Crypto",
+                    style: TextStyle(
+                      color: Colors.white60,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 6,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(
+                  alpha: 0.15,
+                ),
+                borderRadius:
+                    BorderRadius.circular(20),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.circle,
+                    color: Colors.green,
+                    size: 9,
+                  ),
+                  SizedBox(width: 5),
+                  Text(
+                    "LIVE",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _marketCard({
-    required String symbol,
-    required String name,
-    required String price,
-    required String change,
-    required bool isPositive,
-    required IconData icon,
-    required Color color,
-  }) {
+  Widget _marketCard(MarketItem market) {
     final changeColor =
-        isPositive ? Colors.green : Colors.red;
+        market.isPositive
+            ? Colors.green
+            : Colors.red;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(
+        bottom: 12,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -143,10 +257,12 @@ class MarketScreen extends StatelessWidget {
             CircleAvatar(
               radius: 27,
               backgroundColor:
-                  color.withValues(alpha: 0.15),
+                  market.color.withValues(
+                alpha: 0.15,
+              ),
               child: Icon(
-                icon,
-                color: color,
+                market.icon,
+                color: market.color,
                 size: 28,
               ),
             ),
@@ -159,7 +275,7 @@ class MarketScreen extends StatelessWidget {
                     CrossAxisAlignment.start,
                 children: [
                   Text(
-                    symbol,
+                    market.symbol,
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
@@ -169,7 +285,7 @@ class MarketScreen extends StatelessWidget {
                   const SizedBox(height: 5),
 
                   Text(
-                    name,
+                    market.name,
                     style: const TextStyle(
                       color: Colors.white60,
                       fontSize: 12,
@@ -184,20 +300,51 @@ class MarketScreen extends StatelessWidget {
                   CrossAxisAlignment.end,
               children: [
                 Text(
-                  price,
+                  market.price,
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
 
                 const SizedBox(height: 5),
 
-                Text(
-                  change,
-                  style: TextStyle(
-                    color: changeColor,
-                    fontWeight: FontWeight.bold,
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        changeColor.withValues(
+                      alpha: 0.12,
+                    ),
+                    borderRadius:
+                        BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize:
+                        MainAxisSize.min,
+                    children: [
+                      Icon(
+                        market.isPositive
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
+                        size: 13,
+                        color: changeColor,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        market.change,
+                        style: TextStyle(
+                          color: changeColor,
+                          fontWeight:
+                              FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -207,4 +354,77 @@ class MarketScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _marketStatus() {
+    return Row(
+      mainAxisAlignment:
+          MainAxisAlignment.center,
+      children: [
+        const Icon(
+          Icons.access_time,
+          size: 15,
+          color: Colors.white54,
+        ),
+        const SizedBox(width: 5),
+        Text(
+          "Last updated: ${_formatTime(_lastUpdated)}",
+          style: const TextStyle(
+            color: Colors.white54,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _infoCard() {
+    return const Card(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.info_outline,
+              color: Colors.amber,
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "The prices currently displayed are "
+                "demo market data. In the next step, "
+                "we will connect Jibwis AI to a real "
+                "market data API.",
+                style: TextStyle(
+                  color: Colors.white70,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MarketItem {
+  final String symbol;
+  final String name;
+  final String price;
+  final String change;
+  final bool isPositive;
+  final IconData icon;
+  final Color color;
+
+  const MarketItem({
+    required this.symbol,
+    required this.name,
+    required this.price,
+    required this.change,
+    required this.isPositive,
+    required this.icon,
+    required this.color,
+  });
 }
