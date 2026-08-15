@@ -1,0 +1,29 @@
+{
+"project_info": {
+"project_number": "261758170433",
+"project_id": "jibwis-ai",
+"storage_bucket": "jibwis-ai.firebasestorage.app"
+},
+"client": [
+{
+"client_info": {
+"mobilesdk_app_id": "1:261758170433:android:df90efa206aa360c4fddc0",
+"android_client_info": {
+"package_name": "com.jibwis.ai"
+}
+},
+"oauth_client": [],
+"api_key": [
+{
+"current_key": "AIzaSyD_rOsRN79hQ_Hb3-KrEDxVctdyGk10nZ8"
+}
+],
+"services": {
+"appinvite_service": {
+"other_platform_oauth_client": []
+}
+}
+}
+],
+"configuration_version": "1"
+}
